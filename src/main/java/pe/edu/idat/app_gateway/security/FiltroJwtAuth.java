@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -54,7 +55,6 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
                 boolean isAdmin = authentication != null
                         && authentication.getAuthorities().stream()
                         .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
-
                 if (!isAdmin) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("application/json");
@@ -63,7 +63,42 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
                 }
             }
 
-            filterChain.doFilter(request, response);
+            // Envolver la petición cubriendo getHeader, getHeaders y getHeaderNames para ProxyExchange
+            HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper(request) {
+                @Override
+                public String getHeader(String name) {
+                    if ("Authorization".equalsIgnoreCase(name)) {
+                        return "Bearer " + token;
+                    }
+                    return super.getHeader(name);
+                }
+
+                @Override
+                public java.util.Enumeration<String> getHeaders(String name) {
+                    if ("Authorization".equalsIgnoreCase(name)) {
+                        return java.util.Collections.enumeration(java.util.Collections.singletonList("Bearer " + token));
+                    }
+                    return super.getHeaders(name);
+                }
+
+                @Override
+                public java.util.Enumeration<String> getHeaderNames() {
+                    java.util.List<String> names = java.util.Collections.list(super.getHeaderNames());
+                    boolean hasAuth = false;
+                    for (String headerName : names) {
+                        if ("Authorization".equalsIgnoreCase(headerName)) {
+                            hasAuth = true;
+                            break;
+                        }
+                    }
+                    if (!hasAuth) {
+                        names.add("Authorization");
+                    }
+                    return java.util.Collections.enumeration(names);
+                }
+            };
+
+            filterChain.doFilter(wrappedRequest, response);
             
         } catch (JwtException ex) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -28,7 +28,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth ->
                 auth
                     .requestMatchers("/api/auth/**").permitAll()
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
             )
             .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
 

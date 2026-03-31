@@ -4,42 +4,43 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * T-010: Proxy para /api/usuarios (protegido para ROLE_ADMIN)
+ * Proxy manual para /api/tareas
+ * Resuelve el bloqueo de seguridad nativa del Gateway MVC que elimina la cabecera Authorization 
+ * al hacer proxy hacia los microservicios por razones de seguridad anti-fugas.
  */
 @RestController
 @RequiredArgsConstructor
-public class UsuariosProxyController {
+public class TareaProxyController {
 
-    private static final String AUTH_SERVICE_USUARIOS_URL = "http://localhost:8081/api/usuarios";
+    private static final String TASK_SERVICE_URL = "http://localhost:8083/api/tareas";
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping({"/api/usuarios", "/api/usuarios/"})
-    public ResponseEntity<String> listarUsuarios(
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+    @PostMapping({"/api/tareas", "/api/tareas/"})
+    public ResponseEntity<String> crearTareaProxy(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestBody String body) {
 
         if (authorization == null || authorization.isBlank()) {
-            return ResponseEntity.status(401).body("{\"error\": \"Token no proporcionado\"}");
+            return ResponseEntity.status(401).body("{\"error\": \"Token no proporcionado al Gateway\"}");
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", authorization);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
         RestTemplate restTemplate = new RestTemplate();
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    AUTH_SERVICE_USUARIOS_URL,
-                    HttpMethod.GET,
+                    TASK_SERVICE_URL,
+                    HttpMethod.POST,
                     entity,
                     String.class
             );
