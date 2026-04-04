@@ -27,8 +27,8 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
         System.out.println("DEBUG-GATEWAY: Recibida petición en -> " + requestUri + " [" + request.getMethod() + "]");
 
         // HU-01/02: Omitir validación de JWT para registro y login.
-        // Se usa una comprobación más robusta que cubra "/api/auth" con o sin "/" final.
-        if (requestUri != null && (requestUri.startsWith("/api/auth/") || requestUri.equals("/api/auth"))) {
+        // Se usa una comprobación más robusta que cubra "/auth-service/api/auth" con o sin "/" final.
+        if (requestUri != null && (requestUri.startsWith("/auth-service/api/auth/") || requestUri.equals("/auth-service/api/auth"))) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -53,7 +53,7 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
             Claims claims = jwtService.obtenerClaims(token);
             jwtService.generarAutenticacion(claims);
 
-            if (requestUri.startsWith("/api/usuarios")) {
+            if (requestUri.startsWith("/auth-service/api/usuarios")) {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 boolean isAdmin = authentication != null
                         && authentication.getAuthorities().stream()

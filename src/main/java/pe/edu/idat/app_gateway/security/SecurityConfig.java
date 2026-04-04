@@ -33,8 +33,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                 auth
-                    .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/usuarios/**")).hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/auth-service/api/auth/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/auth-service/api/usuarios/**")).hasRole("ADMIN")
                     .anyRequest().authenticated()
             )
             .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
