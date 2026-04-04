@@ -24,8 +24,11 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
                                     HttpServletResponse response, 
                                     FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
+        System.out.println("DEBUG-GATEWAY: Recibida petición en -> " + requestUri + " [" + request.getMethod() + "]");
 
-        if (requestUri.startsWith("/api/auth/")) {
+        // HU-01/02: Omitir validación de JWT para registro y login.
+        // Se usa una comprobación más robusta que cubra "/api/auth" con o sin "/" final.
+        if (requestUri != null && (requestUri.startsWith("/api/auth/") || requestUri.equals("/api/auth"))) {
             filterChain.doFilter(request, response);
             return;
         }
