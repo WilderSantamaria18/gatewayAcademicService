@@ -35,6 +35,7 @@ public class SecurityConfig {
                 auth
                     .requestMatchers(new AntPathRequestMatcher("/auth-service/api/auth/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/auth-service/api/usuarios/**")).hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/finance-service/api/finanzas/**")).authenticated()
                     .anyRequest().authenticated()
             )
             .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
@@ -42,4 +43,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
