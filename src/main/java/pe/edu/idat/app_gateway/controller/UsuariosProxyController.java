@@ -1,6 +1,5 @@
 package pe.edu.idat.app_gateway.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
  * T-010: Proxy para /api/usuarios (protegido para ROLE_ADMIN)
  */
 @RestController
-@RequiredArgsConstructor
 public class UsuariosProxyController {
 
     private static final String AUTH_SERVICE_USUARIOS_URL = "http://localhost:8081/api/usuarios";

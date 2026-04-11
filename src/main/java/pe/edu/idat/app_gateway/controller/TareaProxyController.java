@@ -1,12 +1,14 @@
 package pe.edu.idat.app_gateway.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
  * al hacer proxy hacia los microservicios por razones de seguridad anti-fugas.
  */
 @RestController
-@RequiredArgsConstructor
 public class TareaProxyController {
 
     private static final String TASK_SERVICE_URL = "http://localhost:8083/api/tareas";
