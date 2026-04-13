@@ -65,8 +65,7 @@ public class FiltroJwtAuth extends OncePerRequestFilter {
                 Object userIdClaim = claims.get("id");
                 String userIdFromToken = (userIdClaim != null) ? userIdClaim.toString() : null;
 
-                // Intentar extraer el ID de la URL (ej:
-                // /auth-service/api/usuarios/123/password)
+                // Intentar extraer el ID de la URL
                 String[] pathParts = requestUri.split("/");
                 String idFromUrl = (pathParts.length >= 5) ? pathParts[4] : null;
 
